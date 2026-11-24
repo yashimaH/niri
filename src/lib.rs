@@ -19,6 +19,7 @@ pub mod niri;
 pub mod protocols;
 pub mod render_helpers;
 pub mod rubber_band;
+// [AI バックグラウンド操作検討] フェーズ 2 で Mutter RemoteDesktop と EIS 入力サーバを管理するモジュールをここへ追加する
 #[cfg(feature = "xdp-gnome-screencast")]
 pub mod screencasting;
 pub mod ui;

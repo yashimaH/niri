@@ -79,6 +79,11 @@ const SUPPORTED_COLOR_FORMATS_10BIT: [Fourcc; 3] =
 // Smithay should fall back to Xrgb/Xbgr automatically if needed.
 const SUPPORTED_COLOR_FORMATS: [Fourcc; 2] = [Fourcc::Argb8888, Fourcc::Abgr8888];
 
+// [AI バックグラウンド操作検討] 物理モニタ上で稼働中の Tty セッションに仮想出力を追加する場合 (PR #3800 等) は、
+// 物理 DRM デバイス群 (devices) とは別にオフスクリーン合成用の仮想出力管理をここへ追加する必要がある
+// オフ状態の仮想出力を削除した際のクラッシュ等のライフサイクル不整合に注意する
+// ただし同一 niri インスタンスに仮想出力を足すだけでは seat とフォーカスが人間と共有されるため、
+// フォーカス競合を避けるには別インスタンスで Headless バックエンドを立てる構成を基本とする
 pub struct Tty {
     config: Rc<RefCell<Config>>,
     session: LibSeatSession,

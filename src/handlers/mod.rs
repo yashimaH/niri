@@ -293,6 +293,9 @@ impl KeyboardShortcutsInhibitHandler for State {
     }
 }
 
+// [AI バックグラウンド操作検討] フェーズ 2 で org.gnome.Mutter.RemoteDesktop の Selection 系 (クリップボード橋渡し) を
+// 実装する際は、ここの SelectionHandler / DataDeviceHandler とリモートセッション間のデータ受け渡しを統合する
+// また現状は後続の WlrDataControlHandler / ExtDataControlHandler により非制限クライアントがクリップボードを読める点にも留意する
 impl SelectionHandler for State {
     type SelectionUserData = Arc<[u8]>;
 
@@ -656,6 +659,8 @@ impl ScreencopyHandler for State {
     }
 }
 
+// [AI バックグラウンド操作検討] フェーズ 1 における暫定ポインタ注入経路 (zwlr_virtual_pointer_v1) である
+// 許可確認なしでイベントがそのまま process_input_event に流れるため、フェーズ 2 では EIS + RemoteDesktop portal へ寄せる
 impl VirtualPointerHandler for State {
     fn process_virtual_pointer_event(&mut self, event: InputEvent<VirtualPointerBackend>) {
         self.process_input_event(event);

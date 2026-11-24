@@ -367,6 +367,9 @@ pub struct Niri {
     #[cfg(test)]
     pub single_pixel_buffer_state: SinglePixelBufferState,
 
+    // [AI バックグラウンド操作検討] niri は単一の Seat<State> と単一の keyboard_focus のみを持つ設計であり、
+    // マルチシートや ext-transient-seat-v1 には未対応である
+    // そのため同一インスタンス内で人間と AI が別々のウィンドウへ同時にフォーカスを持つことはできない
     pub seat: Seat<State>,
     /// Scancodes of the keys to suppress.
     pub suppressed_keys: HashSet<Keycode>,
@@ -799,6 +802,8 @@ impl State {
             || env::var_os("WAYLAND_SOCKET").is_some()
             || env::var_os("DISPLAY").is_some();
 
+        // [AI バックグラウンド操作検討] 実運用で Headless バックエンドが選択された場合、
+        // テスト環境と異なりここでレンダラ初期化や初期仮想出力の生成を行う必要がある
         let mut backend = if headless {
             let headless = Headless::new();
             Backend::Headless(headless)
@@ -2641,6 +2646,10 @@ impl Niri {
 
         let (blocker_cleared_tx, blocker_cleared_rx) = mpsc::channel();
 
+        // [AI バックグラウンド操作検討] SecurityContext を経由しないホスト上の通常クライアントはすべて restricted == false となり、
+        // wlr-screencopy、wlr-virtual-pointer、zwp-virtual-keyboard-v1、wlr-data-control に無許可でアクセスできる
+        // フェーズ 2 で EIS / RemoteDesktop portal による同意ベースの正規ルートを導入する際、
+        // これら無制限プロトコルの公開ポリシーをどう扱うか検討が必要である
         fn client_is_unrestricted(client: &Client) -> bool {
             !client.get_data::<ClientState>().unwrap().restricted
         }
@@ -2768,6 +2777,9 @@ impl Niri {
         #[cfg(test)]
         let single_pixel_buffer_state = SinglePixelBufferState::new::<State>(&display_handle);
 
+        // [AI バックグラウンド操作検討] 起動時はキーボードとポインタのみを seat に追加しており、
+        // タッチ capability は物理タッチデバイス検出時 (on_device_added) に動的に追加される
+        // フェーズ 2 で EIS 経由のタッチ入力に対応する場合、seat へのタッチ公開タイミングを検討する必要がある
         let mut seat: Seat<State> = seat_state.new_wl_seat(&display_handle, backend.seat_name());
         let keyboard = match seat.add_keyboard(
             config_.input.keyboard.xkb.to_xkb_config(),

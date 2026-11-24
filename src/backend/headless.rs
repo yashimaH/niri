@@ -24,6 +24,12 @@ use crate::niri::{Niri, RedrawState};
 use crate::render_helpers::{resources, shaders};
 use crate::utils::{get_monotonic_time, logical_output};
 
+// [AI バックグラウンド操作検討] 現在は自動テスト用の最小実装であり、AI 専用ヘッドレスセッション (フェーズ 1) として
+// 実用化するには以下の拡張が必要である
+// 1. init 時または起動直後にレンダラ初期化と初期仮想出力 (例: HEADLESS-1 1920x1080@60) の自動生成を行う
+// 2. DRM レンダーノードと GBM アロケータを保持し、primary_render_node() と import_dmabuf() を実装して GPU クライアントに対応する
+// 3. render() で実際にオフスクリーンテクスチャへ合成描画し、固定リフレッシュタイマで継続的にフレーム更新とキャプチャ供給を行う
+// 4. IPC 経由での仮想出力の動的追加と削除、および on_output_config_changed() への追従を実装する
 pub struct Headless {
     renderer: Option<GlesRenderer>,
     ipc_outputs: Arc<Mutex<IpcOutputMap>>,
@@ -132,6 +138,8 @@ impl Headless {
         None
     }
 
+    // [AI バックグラウンド操作検討] 現在は実描画を行わず RedrawState のリセットと presentation feedback 通知のみ行っている
+    // screencopy クライアントの有無に依存せず一定の合成リフレッシュレートでオフスクリーン描画を回す設計が望ましい
     pub fn render(&mut self, niri: &mut Niri, output: &Output) -> RenderResult {
         let states = RenderElementStates::default();
         let mut presentation_feedbacks = niri.take_presentation_feedbacks(output, &states);
@@ -158,6 +166,7 @@ impl Headless {
         RenderResult::Submitted
     }
 
+    // [AI バックグラウンド操作検討] 実アプリの Wayland クライアントは linux-dmabuf を使うため unimplemented!() の解除が必須である
     pub fn import_dmabuf(&mut self, _dmabuf: &Dmabuf) -> bool {
         unimplemented!()
     }

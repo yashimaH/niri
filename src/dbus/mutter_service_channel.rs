@@ -22,6 +22,8 @@ impl ServiceChannel {
         //
         // In mutter, 1 and 2 get access to mutter_x11_interop.
         // Ours is a stub, so we don't do this filtering.
+        // [AI バックグラウンド操作検討] RemoteDesktop やクリップボード連携で xdg-desktop-portal-gnome が
+        // 追加の service_client_type を要求する場合はここの許可範囲とクライアント権限を見直す
         if !matches!(service_client_type, 1..=3) {
             return Err(fdo::Error::InvalidArgs(
                 "Invalid service client type".to_owned(),

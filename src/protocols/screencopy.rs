@@ -39,6 +39,9 @@ fn screencopy_shm_buffer_stride(size: Size<i32, Physical>) -> i32 {
 /// requested for this timeout, consider the screencast finished.
 const CAST_TIMEOUT: Duration = Duration::from_secs(10);
 
+// [AI バックグラウンド操作検討] フェーズ 1 で wayvnc 等が zwlr_screencopy_manager_v1 を使って画面を取得する際の処理経路である
+// Headless 出力や仮想出力では screencopy クライアント接続中しか画面更新されない問題を避け、
+// 固定の合成リフレッシュレートと damage 追跡でフレームを返せるようにする必要がある
 pub struct ScreencopyQueue {
     /// Credentials of this wlr-screencopy client, if known.
     credentials: Option<Credentials>,

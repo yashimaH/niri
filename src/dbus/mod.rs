@@ -32,6 +32,9 @@ trait Start: Interface {
     fn start(self, monitor: bool) -> anyhow::Result<zbus::blocking::Connection>;
 }
 
+// [AI バックグラウンド操作検討] フェーズ 2 で xdg-desktop-portal-gnome 経由の RemoteDesktop を有効化するには、
+// org.gnome.Mutter.RemoteDesktop インターフェースの D-Bus 接続 (conn_remote_desktop) をここへ追加し、
+// mutter_screen_cast 側とセッション ID を共有できるようにする必要がある
 #[derive(Default)]
 pub struct DBusServers {
     pub conn_service_channel: Option<Connection>,
@@ -206,6 +209,8 @@ impl DBusServers {
     }
 }
 
+// [AI バックグラウンド操作検討] ReplaceExisting フラグにより既存の同名 D-Bus 所有者を置き換える実装となっている
+// 同一セッションバス上でメイン niri と AI 用ヘッドレス niri の両方が D-Bus サービスを起動すると名前競合が起きるため注意する
 fn request_name(conn: &Connection, name: &'static str, monitor: bool) -> zbus::Result<()> {
     if monitor {
         if let Err(err) = start_name_monitor(conn, name) {

@@ -70,6 +70,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cli = Cli::parse();
 
+    // [AI バックグラウンド操作検討] --session 指定時は WAYLAND_DISPLAY 等を除去し、後続の import_environment() で
+    // ユーザー全体の systemd と D-Bus 環境変数を上書きする
+    // 同一ユーザー上で人間のメインセッションと並行して AI 用インスタンスを起動する場合は、
+    // メイン側の WAYLAND_DISPLAY や NIRI_SOCKET を破壊しないよう --session の扱いや環境分離に注意する必要がある
     if cli.session {
         // If we're starting as a session, assume that the intention is to start on a TTY unless
         // this is a WSL environment. Remove DISPLAY, WAYLAND_DISPLAY or WAYLAND_SOCKET from our
@@ -183,6 +187,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Increase the buffer size so that it's harder to crash a frozen client with a 1000 Hz mouse.
     set_default_max_buffer_size(&display, 1024 * 1024);
 
+    // [AI バックグラウンド操作検討] 現在は第 5 引数 headless が false 固定であり実運用では選択できない
+    // フェーズ 1 で NIRI_BACKEND=headless や --headless オプションからヘッドレス起動できるように修正が必要である
     let mut state = State::new(
         config,
         event_loop.handle(),
@@ -234,6 +240,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    // [AI バックグラウンド操作検討] 同一セッションバス上で複数の niri が D-Bus 名を取り合うのを防ぐため、
+    // AI 専用インスタンスで ScreenCast や RemoteDesktop を使う場合は dbus-run-session 等でのバス分離も検討する
     #[cfg(feature = "dbus")]
     dbus::DBusServers::start(&mut state, cli.session);
 

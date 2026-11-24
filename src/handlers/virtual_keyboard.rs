@@ -32,6 +32,9 @@ pub struct VirtualKeyboardKeymap {
     pub saved: SavedKeyboardState,
 }
 
+// [AI バックグラウンド操作検討] フェーズ 1 における暫定キーボード注入経路 (zwp_virtual_keyboard_v1) である
+// 分離されたヘッドレスインスタンス内ではメインセッションに影響しないが、単一 seat の xkb 状態を共有するため
+// デバイスの生成や破棄に伴う keymap 切替や modifier 状態の残留、フォーカス揺れに注意する必要がある
 impl VirtualKeyboardHandler for State {
     fn process_virtual_keyboard_event(&mut self, event: InputEvent<VirtualKeyboardBackend>) {
         match event {

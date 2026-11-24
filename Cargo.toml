@@ -106,6 +106,8 @@ wayland-server = "0.31.14"
 xcursor = "0.3.11"
 zbus = { version = "5", optional = true }
 
+# [AI バックグラウンド操作検討] 現在の smithay リビジョンには reis ベースの EIS 実装 (Smithay PR #2051) が含まれている
+# フェーズ 2 で EIS 入力サーバを実装する際は backend_eis 等の対応 feature をここへ追加する
 [dependencies.smithay]
 workspace = true
 features = [
@@ -144,6 +146,8 @@ dbus = ["dep:zbus", "dep:async-io", "dep:accesskit", "dep:accesskit_unix"]
 # Enables systemd integration (global environment, apps in transient scopes).
 systemd = ["dbus"]
 # Enables screencasting support through xdg-desktop-portal-gnome.
+# [AI バックグラウンド操作検討] フェーズ 2 で org.gnome.Mutter.RemoteDesktop + EIS を実装する際、
+# xdp-gnome-screencast と統合するか独立した feature として定義するかを検討する
 xdp-gnome-screencast = ["dbus", "pipewire"]
 # Enables the Tracy profiler instrumentation.
 profile-with-tracy = ["profiling/profile-with-tracy", "tracy-client/default", "smithay/tracy_gpu_profiling"]

@@ -24,6 +24,8 @@ pub struct Cli {
     /// Set this flag in a systemd service started by your display manager, or when running
     /// manually as your main compositor instance. Do not set when running as a nested window, or
     /// on a TTY as your non-main compositor instance, to avoid messing up the global environment.
+    // [AI バックグラウンド操作検討] フェーズ 1 で AI 専用のヘッドレスインスタンスを別起動する際、
+    // --headless 等のバックエンド指定フラグや、グローバル環境を上書きせずに必要なサービスのみ起動する指定方法を検討する
     #[arg(long)]
     pub session: bool,
     /// Command to run upon compositor startup.
@@ -87,6 +89,8 @@ pub enum Msg {
         #[command(subcommand)]
         action: Action,
     },
+    // [AI バックグラウンド操作検討] フェーズ 1 で仮想出力を動的に作成や削除するサブコマンド
+    // (create-virtual-output / remove-virtual-output 等) を追加する場合はここへ定義する
     /// Change output configuration temporarily.
     ///
     /// The configuration is changed temporarily and not saved into the config file. If the output

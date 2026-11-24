@@ -71,6 +71,9 @@ struct EventStreamSender {
     disconnect: Sender<()>,
 }
 
+// [AI バックグラウンド操作検討] ソケット名に WAYLAND_DISPLAY とプロセス ID が含まれるため、
+// メインセッションとは別に起動した AI 専用 niri インスタンスも固有の NIRI_SOCKET で独立して IPC 操作できる
+// 仮想出力の作成や削除リクエストを処理するハンドラも本ファイル内のリクエスト処理部に追加する
 impl IpcServer {
     pub fn start(
         event_loop: &LoopHandle<'static, State>,

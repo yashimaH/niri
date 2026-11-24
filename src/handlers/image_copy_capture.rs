@@ -30,6 +30,8 @@ use crate::render_helpers::CaptureBuffer;
 use crate::utils::{get_credentials_for_client, CastSessionId, CastStreamId};
 use crate::window::mapped::{Mapped, MappedId};
 
+// [AI バックグラウンド操作検討] ext-image-copy-capture-v1 による画面キャプチャセッションである
+// Headless バックエンド実用化時にはバッファ制約通知 (SHM / dmabuf) とオフスクリーン描画の連携が必要になる
 /// Output capture session.
 pub struct ImageCopySession {
     pub session: Session,

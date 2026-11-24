@@ -61,6 +61,8 @@ use serde::{Deserialize, Serialize};
 pub mod socket;
 pub mod state;
 
+// [AI バックグラウンド操作検討] AI エージェントは NIRI_SOCKET を対象インスタンスへ向けることでウィンドウ操作等を行える
+// フェーズ 1 で仮想出力の動的作成や削除 (CreateVirtualOutput / RemoveVirtualOutput 等) に対応する際はここへ Request を追加する
 /// Request from client to niri.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]

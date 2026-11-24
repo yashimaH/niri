@@ -17,6 +17,9 @@ where
     type NiriDevice = Self::Device;
 }
 
+// [AI バックグラウンド操作検討] フェーズ 2 で EIS 入力バックエンド (reis / Smithay libei) を導入する際は、
+// EIS デバイス型に対して NiriInputDevice を実装し、ScreenCast セッションや EI region に紐づく Output を返すようにする
+// 特定の出力名 (DP-2 等) を決め打ちせず、マルチモニタ配置や仮想出力の動的追加と削除に追従させる必要がある
 pub trait NiriInputDevice: input::Device {
     // FIXME: this should maybe be per-event, not per-device,
     // but it's not clear that this matters in practice?

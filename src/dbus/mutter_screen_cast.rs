@@ -122,6 +122,10 @@ impl ScreenCast {
         #[zbus(object_server)] server: &ObjectServer,
         properties: HashMap<&str, Value<'_>>,
     ) -> fdo::Result<OwnedObjectPath> {
+        // [AI バックグラウンド操作検討] 現在は remote-desktop-session-id が渡されるとエラーを返して拒否している
+        // フェーズ 2 で org.gnome.Mutter.RemoteDesktop を実装する際はここで該当セッションと紐付け、
+        // 選択された出力やウィンドウの論理座標から EIS の EI region を動的に構成する必要がある (出力名の決め打ちは避ける)
+        // またヘッドレスや仮想画面向けに RecordVirtual メソッドを追加するかもあわせて検討する
         if properties.contains_key("remote-desktop-session-id") {
             return Err(fdo::Error::Failed(
                 "there are no remote desktop sessions".to_owned(),

@@ -173,6 +173,9 @@ impl ShouldInterceptResult {
 }
 
 impl State {
+    // [AI バックグラウンド操作検討] 物理入力、仮想入力、および将来追加する EIS 入力がすべて合流する共通ディスパッチ関数である
+    // フェーズ 3 でメインセッション内に人間と AI を共存させる場合は、注入元の識別による「AI 操作中」の可視化や、
+    // 人間の物理入力を検知した際の AI 入力一時停止、idle-notifier やモニタ省電力復帰の扱いなどをここで制御する
     pub fn process_input_event<I: InputBackend + 'static>(&mut self, event: InputEvent<I>)
     where
         I::Device: 'static, // Needed for downcasting.
@@ -305,6 +308,9 @@ impl State {
         }
     }
 
+    // [AI バックグラウンド操作検討] self.niri.touch は現在 process_libinput_event でのみ追加と削除が行われている
+    // フェーズ 2 で EIS 経由のタッチデバイスを追加した場合、デバイス切断時の self.niri.touch.is_empty() 判定と
+    // seat.add_touch() / seat.remove_touch() の整合が崩れないようタッチデバイス管理を見直す必要がある
     fn on_device_added(&mut self, device: impl Device) {
         if device.has_capability(DeviceCapability::TabletTool) {
             let tablet_seat = self.niri.seat.tablet_seat();
@@ -454,6 +460,10 @@ impl State {
             .is_some_and(KeyboardShortcutsInhibitor::is_active)
     }
 
+    // [AI バックグラウンド操作検討] 現在は VirtualKeyboardDevice のみ downcast_ref で特別扱いし keymap 切り替え等を行っている
+    // フェーズ 2 とフェーズ 3 では EIS キーボードデバイス (keymap / keysym) の扱いとあわせて、
+    // AI からのキー入力で niri 自体のキーバインド (ワークスペース移動など) を発火させるかアプリ入力のみに限るか、
+    // デバイス単位のポリシー制御をここで検討する必要がある
     fn on_keyboard<I: InputBackend>(
         &mut self,
         event: I::KeyboardKeyEvent,
@@ -3518,6 +3528,9 @@ impl State {
 
                 // FIXME: granular.
                 self.niri.queue_redraw_all();
+            // [AI バックグラウンド操作検討] フェーズ 3 検討箇所 (PR #3984 相当) である
+            // 画面上の仮想キーボード等の layer-shell サーフェスをクリックした際、pointer_contents.layer が存在するにもかかわらず
+            // 出力フォーカスが移動してしまう問題を防ぐには、ここで layer 判定の分岐を入れることを検討する
             } else if let Some(output) = self.niri.output_under_cursor() {
                 self.niri.layout.focus_output(&output);
 
@@ -4727,6 +4740,9 @@ impl State {
         );
     }
 
+    // [AI バックグラウンド操作検討] 絶対座標イベントをグローバル論理座標へ変換する関数である
+    // マルチモニタ環境や仮想出力環境で EIS の絶対ポインタやタッチ座標がずれないよう、
+    // evt.device().output(self) と EI region の対応付けを正確に保つ必要がある
     fn compute_absolute_location<I: InputBackend>(
         &self,
         evt: &impl AbsolutePositionEvent<I>,
@@ -4861,6 +4877,8 @@ impl State {
 
                 // FIXME: granular.
                 self.niri.queue_redraw_all();
+            // [AI バックグラウンド操作検討] フェーズ 3 検討箇所 (PR #3984 相当) である
+            // タッチ操作でも仮想入力用 layer-shell サーフェス (under.layer) 上のタップで出力フォーカスが変わらないよう検討する
             } else if let Some(output) = under.output {
                 self.niri.layout.focus_output(&output);
 

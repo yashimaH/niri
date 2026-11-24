@@ -76,6 +76,8 @@ impl Screencasting {
 }
 
 impl State {
+    // [AI バックグラウンド操作検討] Headless バックエンドや仮想出力を PipeWire で配信する際、
+    // gbm_device() が None だと SHM のみになる点、および物理モニタの VBlank が無い環境での再描画駆動に注意する
     fn prepare_pw_cast(&mut self) -> anyhow::Result<Option<(GbmDevice<DeviceFd>, FormatSet)>> {
         // Ensure PipeWire is initialized.
         if self.niri.casting.pipewire.is_none() {

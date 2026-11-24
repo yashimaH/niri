@@ -5,6 +5,8 @@ use crate::utils::{Flag, MergeWith};
 #[derive(Debug, Default, PartialEq)]
 pub struct Debug {
     pub preview_render: Option<PreviewRender>,
+    // [AI バックグラウンド操作検討] --session を付けずに起動した AI 用インスタンスで
+    // ScreenCast や RemoteDesktop 等の D-Bus インターフェースを公開したい場合に関係するフラグである
     pub dbus_interfaces_in_non_session_instances: bool,
     pub wait_for_frame_completion_before_queueing: bool,
     pub enable_overlay_planes: bool,

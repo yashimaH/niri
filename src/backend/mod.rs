@@ -21,6 +21,8 @@ pub use winit::Winit;
 pub mod headless;
 pub use headless::Headless;
 
+// [AI バックグラウンド操作検討] フェーズ 1 では Headless バックエンドの実用化に加え、
+// Tty バックエンド動作中にも仮想出力を動的に作成や削除できるインターフェースの追加を検討する
 #[allow(clippy::large_enum_variant)]
 pub enum Backend {
     Tty(Tty),
@@ -170,6 +172,8 @@ impl Backend {
         }
     }
 
+    // [AI バックグラウンド操作検討] Headless が None を返すと PipeWire ScreenCast が SHM のみにフォールバックする
+    // ヘッドレス環境でも効率的に映像転送を行う場合は DRM レンダーノードから GbmDevice を保持して返す対応を検討する
     #[cfg(feature = "xdp-gnome-screencast")]
     pub fn gbm_device(
         &self,

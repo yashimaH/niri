@@ -47,6 +47,8 @@ pub struct Modeline {
     pub vsync_polarity: niri_ipc::VSyncPolarity,
 }
 
+// [AI バックグラウンド操作検討] フェーズ 1 で仮想出力やヘッドレス出力の設定を設定ファイルから宣言的に指定可能にする場合、
+// 本構造体や Outputs の定義を拡張する (PR #3800 でも変更対象となりコンフリクトしやすい箇所である)
 #[derive(knuffel::Decode, Debug, Clone, PartialEq)]
 pub struct Output {
     #[knuffel(child)]
